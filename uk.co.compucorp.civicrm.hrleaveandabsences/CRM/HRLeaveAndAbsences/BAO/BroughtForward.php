@@ -20,4 +20,30 @@ class CRM_HRLeaveAndAbsences_BAO_BroughtForward extends CRM_HRLeaveAndAbsences_D
 
     return $instance;
   }
+
+  /**
+   * Returns the brought forward balance for the given entitlement ID.
+   *
+   * @param int $entitlementID
+   *
+   * @return float
+   */
+  public static function getBalanceForEntitlement($entitlementID) {
+    $tableName = self::getTableName();
+
+    $query = "
+      SELECT SUM(balance) as balance
+      FROM {$tableName}
+      WHERE entitlement_id = %1
+    ";
+
+    $params = [
+      '1' => [$entitlementID, 'Integer']
+    ];
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao->fetch();
+    return (float)$dao->balance;
+  }
+
 }

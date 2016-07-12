@@ -218,7 +218,7 @@ class CRM_HRLeaveAndAbsences_BAO_Entitlement extends CRM_HRLeaveAndAbsences_DAO_
    *
    * Pro Rata + Brought Forward Balance + Leave Requests Balance
    *
-   * @return int
+   * @return float
    */
   public function getBalance() {
     $leaveRequestBalance = $this->getLeaveRequestBalance();
@@ -230,23 +230,10 @@ class CRM_HRLeaveAndAbsences_BAO_Entitlement extends CRM_HRLeaveAndAbsences_DAO_
   /**
    * Returns the Brought Forward balance for this entitlement
    *
-   * @return int
+   * @return float
    */
-  public function getBroughtForwardBalance()
-  {
-    $query = "
-      SELECT SUM(balance) as balance
-      FROM civicrm_hrleaveandabsences_brought_forward
-      WHERE entitlement_id = %1
-    ";
-
-    $params = [
-      '1' => [$this->id, 'Integer']
-    ];
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $dao->fetch();
-    return (int)$dao->balance;
+  public function getBroughtForwardBalance() {
+    return BroughtForward::getBalanceForEntitlement($this->id);
   }
 
   /**
