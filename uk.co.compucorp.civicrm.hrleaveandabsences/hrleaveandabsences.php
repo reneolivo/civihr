@@ -30,6 +30,7 @@ function hrleaveandabsences_civicrm_xmlMenu(&$files) {
 function hrleaveandabsences_civicrm_install() {
   _hrleavesandabsences_create_main_menu();
   _hrleaveandabsences_create_administer_menu();
+  _hrleaveandabsences_add_scheduled_jobs();
 
   _hrleaveandabsences_civix_civicrm_install();
 }
@@ -148,6 +149,38 @@ function _hrleaveandabsences_add_navigation_menu($params)
   $navigationMenu->save();
 
   return $navigationMenu;
+}
+
+/**
+ * Adds the scheduled jobs for this extension
+ */
+function _hrleaveandabsences_add_scheduled_jobs()
+{
+  _hrleaveandabsences_add_create_expiration_records_scheduled_job();
+}
+
+/**
+ * Adds the "Create Brought Forward expiration records" scheduled job.
+ */
+function _hrleaveandabsences_add_create_expiration_records_scheduled_job()
+{
+  $dao = new CRM_Core_DAO_Job();
+  $dao->api_entity = 'BroughtForward';
+  $dao->api_action = 'createexpirationrecords';
+  $dao->find(TRUE);
+  if (!$dao->id)
+  {
+    $dao = new CRM_Core_DAO_Job();
+    $dao->domain_id = CRM_Core_Config::domainID();
+    $dao->run_frequency = 'Daily';
+    $dao->parameters = null;
+    $dao->name = 'Create Brought Forward expiration records';
+    $dao->description = 'Creates a record with a negative balance for any expired brought forward';
+    $dao->api_entity = 'BroughtForward';
+    $dao->api_action = 'createexpirationrecords';
+    $dao->is_active = 0;
+    $dao->save();
+  }
 }
 
 /**
