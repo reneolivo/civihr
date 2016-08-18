@@ -31,7 +31,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveRequestTest extends PHPUnit_Framework_Test
   {
     $fromDate = new DateTime();
     $leaveRequest = LeaveRequest::create([
-      'entitlement_id' => 1,
+      'balance_id' => 1,
       'status_id' => 1, //The status is not important here. We just need a value to be stored in the DB
       'from_date' => $fromDate->format('YmdHis'),
       'from_date_type' => 1 //The type is not important here. We just need a value to be stored in the DB
@@ -47,7 +47,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveRequestTest extends PHPUnit_Framework_Test
     $fromDate = new DateTime();
     $toDate = new DateTime('+3 days');
     $leaveRequest = LeaveRequest::create([
-      'entitlement_id' => 1,
+      'balance_id' => 1,
       'status_id' => 1, //The status is not important here. We just need a value to be stored in the DB
       'from_date' => $fromDate->format('YmdHis'),
       'from_date_type' => 1, //The type is not important here. We just need a value to be stored in the DB
@@ -67,7 +67,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveRequestTest extends PHPUnit_Framework_Test
   {
     $fromDate = new DateTime();
     $leaveRequest = LeaveRequest::create([
-      'entitlement_id' => 1,
+      'balance_id' => 1,
       'status_id' => 1,
       'from_date' => $fromDate->format('YmdHis'),
       'from_date_type' => 1

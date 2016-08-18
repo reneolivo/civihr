@@ -19,7 +19,7 @@ trait CRM_HRLeaveAndAbsences_LeaveBalanceChangeHelpersTrait {
   public function createSourcelessBalanceChange($entitlementID, $amount, $type, $expiryDate = null) {
     $params = [
       'type_id' => $type,
-      'entitlement_id' => $entitlementID,
+      'balance_id' => $entitlementID,
       'amount' => $amount
     ];
 
@@ -66,7 +66,7 @@ trait CRM_HRLeaveAndAbsences_LeaveBalanceChangeHelpersTrait {
 
     LeaveBalanceChange::create([
       'type_id' => $this->getBalanceChangeTypeValue('Brought Forward'),
-      'entitlement_id' => $entitlementID,
+      'balance_id' => $entitlementID,
       'amount' => $expiredAmount * -1, //expired amounts should be negative
       'expired_balance_change_id' => $broughtForwardBalanceChangeID
     ]);
@@ -105,7 +105,7 @@ trait CRM_HRLeaveAndAbsences_LeaveBalanceChangeHelpersTrait {
     $toDate = $toDate ? "'{$toDate}'" : 'NULL';
 
     $query = "
-      INSERT INTO {$leaveRequestTable}(entitlement_id, status_id, from_date, to_date)
+      INSERT INTO {$leaveRequestTable}(balance_id, status_id, from_date, to_date)
       VALUES({$entitlementID}, {$status}, {$fromDate}, {$toDate})
     ";
 
@@ -134,7 +134,7 @@ trait CRM_HRLeaveAndAbsences_LeaveBalanceChangeHelpersTrait {
       $dateId = $this->getLastIdInTable($leaveRequestDateTableName);
 
       CRM_Core_DAO::executeQuery("
-        INSERT INTO {$balanceChangeTableName}(entitlement_id, type_id, amount, source_id)
+        INSERT INTO {$balanceChangeTableName}(balance_id, type_id, amount, source_id)
         VALUES('{$entitlementID}', {$debitBalanceChangeType}, -1, {$dateId})
       ");
     }

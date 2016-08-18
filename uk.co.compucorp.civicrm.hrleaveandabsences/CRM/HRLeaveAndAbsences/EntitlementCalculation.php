@@ -1,7 +1,7 @@
 <?php
 
 use CRM_HRLeaveAndAbsences_BAO_AbsencePeriod as AbsencePeriod;
-use CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement as LeavePeriodEntitlement;
+use CRM_HRLeaveAndAbsences_BAO_LeaveBalance as LeaveBalance;
 use CRM_HRLeaveAndAbsences_BAO_AbsenceType as AbsenceType;
 use CRM_HRLeaveAndAbsences_BAO_PublicHoliday as PublicHoliday;
 
@@ -45,11 +45,11 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
   private $previousPeriod;
 
   /**
-   * Variable to cache the return from the getPreviousPeriodEntitlement method
+   * Variable to cache the return from the getPreviousPeriodLeaveBalance method
    *
-   * @var \CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement
+   * @var \CRM_HRLeaveAndAbsences_BAO_LeaveBalance
    */
-  private $previousPeriodEntitlement;
+  private $previousPeriodLeaveBalance;
 
   /**
    * Variable to cache the return from the getNumberOfWorkingDaysForPeriod method
@@ -80,14 +80,14 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
   private $jobLeave;
 
   /**
-   * Variable to cache the return from the getPeriodEntitlement method.
+   * Variable to cache the return from the getPeriodLeaveBalance method.
    *
-   * If false, it means the entitlement was never loaded. If null, it means there's
-   * no stored entitlement for the current period.
+   * If false, it means the LeaveBalance was never loaded. If null, it means there's
+   * no stored LeaveBalance for the current period.
    *
    * @var bool|null
    */
-  private $periodEntitlement = FALSE;
+  private $periodLeaveBalance = FALSE;
 
   /**
    * Creates a new EntitlementCalculation instance
@@ -186,7 +186,7 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
    * @return float|int
    */
   public function getProposedEntitlement() {
-    $periodEntitlement = $this->getPeriodEntitlement();
+    $periodEntitlement = $this->getPeriodLeaveBalance();
 
     if($periodEntitlement && $periodEntitlement->overridden) {
       return $periodEntitlement->getEntitlement();
@@ -196,22 +196,22 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
   }
 
   /**
-   * Returns the previously calculated entitlement for the calculation period.
+   * Returns the existing LeaveBalance for the calculation period.
    *
-   * If there's no such entitlement, returns null.
+   * If there's no LeaveBalance for the period , returns null.
    *
-   * @return \CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement|null
+   * @return \CRM_HRLeaveAndAbsences_BAO_LeaveBalance|null
    */
-  private function getPeriodEntitlement() {
-    if($this->periodEntitlement === false) {
-      $this->periodEntitlement = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+  private function getPeriodLeaveBalance() {
+    if($this->periodLeaveBalance === false) {
+      $this->periodLeaveBalance = LeaveBalance::getPeriodLeaveBalanceForContract(
         $this->contract['id'],
         $this->period->id,
         $this->absenceType->id
       );
     }
 
-    return $this->periodEntitlement;
+    return $this->periodLeaveBalance;
   }
 
   /**
@@ -221,8 +221,8 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
    * @return bool
    */
   public function isCurrentPeriodEntitlementOverridden() {
-    $periodEntitlement = $this->getPeriodEntitlement();
-    return $periodEntitlement && $periodEntitlement->overridden;
+    $leaveBalance = $this->getPeriodLeaveBalance();
+    return $leaveBalance && $leaveBalance->overridden;
   }
 
   /**
@@ -231,26 +231,25 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
    *
    * @return bool
    */
-  public function getCurrentPeriodEntitlementComment()
-  {
-    $periodEntitlement = $this->getPeriodEntitlement();
-    return $periodEntitlement ? $periodEntitlement->comment : '';
+  public function getCurrentPeriodEntitlementComment() {
+    $leaveBalance = $this->getPeriodLeaveBalance();
+    return $leaveBalance ? $leaveBalance->comment : '';
   }
 
   /**
-   * Returns the proposed entitlement for this AbsenceType and Contract on the
+   * Returns the entitlement for this AbsenceType and Contract on the
    * previous period.
    *
    * @return int
    */
   public function getPreviousPeriodProposedEntitlement() {
-    $previousPeriodEntitlement = $this->getPreviousPeriodEntitlement();
+    $previousPeriodLeaveBalance = $this->getPreviousPeriodLeaveBalance();
 
-    if(!$previousPeriodEntitlement) {
+    if(!$previousPeriodLeaveBalance) {
       return 0;
     }
 
-    return $previousPeriodEntitlement->getEntitlement();
+    return $previousPeriodLeaveBalance->getEntitlement();
   }
 
   /**
@@ -259,18 +258,18 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
    * This is, basically, the LeaveRequest balance from the previous period, but
    * returned as a positive number
    *
-   * @see CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement::getLeaveRequestBalance()
+   * @see CRM_HRLeaveAndAbsences_BAO_LeaveBalance::getLeaveRequestBalance()
    *
    * @return float
    */
   public function getNumberOfDaysTakenOnThePreviousPeriod() {
-    $entitlement = $this->getPreviousPeriodEntitlement();
+    $leaveBalance = $this->getPreviousPeriodLeaveBalance();
 
-    if(!$entitlement) {
+    if(!$leaveBalance) {
       return 0.0;
     }
 
-    return $entitlement->getLeaveRequestBalance() * -1.0;
+    return $leaveBalance->getLeaveRequestBalance() * -1.0;
   }
 
   /**
@@ -281,7 +280,7 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
    * @return float
    */
   public function getNumberOfDaysRemainingInThePreviousPeriod() {
-    $entitlement = $this->getPreviousPeriodEntitlement();
+    $entitlement = $this->getPreviousPeriodLeaveBalance();
 
     if(!$entitlement) {
       return 0;
@@ -321,26 +320,27 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculation {
   }
 
   /**
-   * Returns the calculated Entitlement for the previous period.
+   * Returns the LeaveBalance for the previous period.
    *
-   * @return \CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement|null
-   *          The entitlement for the previous period or null if there's no previous period or entitlement
+   * @return \CRM_HRLeaveAndAbsences_BAO_LeaveBalance|null
+   *          The LeaveBalance for the previous period or null if there's no
+   *          previous period or it doesn't have a LeaveBalance
    */
-  private function getPreviousPeriodEntitlement() {
+  private function getPreviousPeriodLeaveBalance() {
     $previousPeriod = $this->getPreviousPeriod();
     if(!$previousPeriod) {
       return null;
     }
 
-    if(!$this->previousPeriodEntitlement) {
-      $this->previousPeriodEntitlement = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+    if(!$this->previousPeriodLeaveBalance) {
+      $this->previousPeriodLeaveBalance = LeaveBalance::getPeriodLeaveBalanceForContract(
         $this->contract['id'],
         $previousPeriod->id,
         $this->absenceType->id
       );
     }
 
-    return $this->previousPeriodEntitlement;
+    return $this->previousPeriodLeaveBalance;
   }
 
   /**

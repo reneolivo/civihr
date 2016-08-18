@@ -6,7 +6,7 @@ use Civi\Test\TransactionalInterface;
 use CRM_Hrjobcontract_BAO_HRJobContract as JobContract;
 use CRM_HRLeaveAndAbsences_BAO_AbsencePeriod as AbsencePeriod;
 use CRM_HRLeaveAndAbsences_BAO_AbsenceType as AbsenceType;
-use CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement as LeavePeriodEntitlement;
+use CRM_HRLeaveAndAbsences_BAO_LeaveBalance as LeaveBalance;
 use CRM_HRLeaveAndAbsences_BAO_LeaveRequest as LeaveRequest;
 use CRM_HRLeaveAndAbsences_BAO_PublicHoliday as PublicHoliday;
 use CRM_HRLeaveAndAbsences_EntitlementCalculation as EntitlementCalculation;
@@ -949,7 +949,7 @@ class CRM_HRLeaveAndAbsences_EntitlementCalculationTest extends PHPUnit_Framewor
       $params['comment_date'] = date('YmdHis');
     }
 
-    $periodEntitlement = LeavePeriodEntitlement::create($params);
+    $periodEntitlement = LeaveBalance::create($params);
 
     $this->createLeaveBalanceChange($periodEntitlement->id, $numberOfDays);
 

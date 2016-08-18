@@ -2,9 +2,9 @@
 
 <table>
   <base>CRM/HRLeaveAndAbsences</base>
-  <class>LeavePeriodEntitlement</class>
-  <name>civicrm_hrleaveandabsences_leave_period_entitlement</name>
-  <comment>A period entitlement for an specific set a contract and absence type</comment>
+  <class>LeaveBalance</class>
+  <name>civicrm_hrleaveandabsences_leave_balance</name>
+  <comment>The balance for a specific set of absence period, contract and absence type</comment>
   <add>4.4</add>
   <log>true</log>
 
@@ -12,7 +12,7 @@
     <name>id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Unique Leave Period Entitlement ID</comment>
+    <comment>Unique Leave Balance ID</comment>
     <add>4.4</add>
   </field>
   <primaryKey>
@@ -62,7 +62,7 @@
     <name>overridden</name>
     <type>boolean</type>
     <default>false</default>
-    <comment>Indicates if the entitlement was overridden</comment>
+    <comment>Indicates if this balance's entitlement was overridden</comment>
     <add>4.4</add>
   </field>
 
@@ -70,14 +70,14 @@
     <name>comment</name>
     <type>text</type>
     <length>400</length>
-    <comment>The comment added by the user about the calculation for this entitlement</comment>
+    <comment>The comment added by the user about the calculation for this balance's entitlement</comment>
     <add>4.4</add>
   </field>
 
   <field>
     <name>comment_author_id</name>
     <type>int unsigned</type>
-    <comment>FK to Contact. The contact that represents the user who added the comment to this entitlement</comment>
+    <comment>FK to Contact. The contact that represents the user who added the comment to this balance's entitlement</comment>
     <add>4.4</add>
   </field>
   <foreignKey>
@@ -91,12 +91,12 @@
   <field>
     <name>comment_date</name>
     <type>datetime</type>
-    <comment>The date and time the comment for this entitlement was added/updated</comment>
+    <comment>The date and time the comment for this balance's entitlement was added/updated</comment>
     <add>4.4</add>
   </field>
 
   <index>
-    <name>unique_entitlement</name>
+    <name>unique_balance</name>
     <fieldName>period_id</fieldName>
     <fieldName>contract_id</fieldName>
     <fieldName>type_id</fieldName>

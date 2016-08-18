@@ -9,15 +9,15 @@ use CRM_HRLeaveAndAbsences_BAO_AbsenceType as AbsenceType;
 use CRM_HRLeaveAndAbsences_BAO_AbsencePeriod as AbsencePeriod;
 use CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChange as LeaveBalanceChange;
 use CRM_HRLeaveAndAbsences_BAO_LeaveRequest as LeaveRequest;
-use CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement as LeavePeriodEntitlement;
+use CRM_HRLeaveAndAbsences_BAO_LeaveBalance as LeaveBalance;
 use CRM_HRLeaveAndAbsences_BAO_PublicHoliday as PublicHoliday;
 
 /**
- * Class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest
+ * Class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceTest
  *
  * @group headless
  */
-class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Framework_TestCase implements
+class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceTest extends PHPUnit_Framework_TestCase implements
   HeadlessInterface, TransactionalInterface {
 
   use CRM_HRLeaveAndAbsences_LeaveBalanceChangeHelpersTrait;
@@ -49,13 +49,13 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
    * @expectedExceptionMessage DB Error: already exists
    */
   public function testThereCannotBeMoreThanOneEntitlementForTheSameSetOfAbsenceTypeAbsencePeriodAndContract() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'period_id' => 1,
       'type_id' => 1,
       'contract_id' => 1
     ]);
 
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'period_id' => 1,
       'type_id' => 1,
       'contract_id' => 1
@@ -63,43 +63,43 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
   }
 
   /**
-   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeavePeriodEntitlementException
+   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeaveBalanceException
    * @expectedExceptionMessage The author of the comment cannot be null
    */
   public function testCommentsShouldHaveAuthor() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'comment' => 'Lorem ipsum dolor sit....',
       'comment_updated_at' => date('YmdHis')
     ]);
   }
 
   /**
-   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeavePeriodEntitlementException
+   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeaveBalanceException
    * @expectedExceptionMessage The date of the comment cannot be null
    */
   public function testCommentsShouldHaveDate() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'comment' => 'Lorem ipsum dolor sit....',
       'comment_author_id' => 2
     ]);
   }
 
   /**
-   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeavePeriodEntitlementException
+   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeaveBalanceException
    * @expectedExceptionMessage The date of the comment should be null if the comment is empty
    */
   public function testEmptyCommentsShouldNotHaveDate() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'comment_date' => date('YmdHis')
     ]);
   }
 
   /**
-   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeavePeriodEntitlementException
+   * @expectedException CRM_HRLeaveAndAbsences_Exception_InvalidLeaveBalanceException
    * @expectedExceptionMessage The author of the comment should be null if the comment is empty
    */
   public function testEmptyCommentsShouldNotHaveAuthor() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'comment_author_id' => 2
     ]);
   }
@@ -233,25 +233,25 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
   }
 
   public function testGetContractEntitlementForPeriod() {
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'period_id' => 1,
       'type_id' => 1,
       'contract_id' => 1,
     ]);
 
-    LeavePeriodEntitlement::create([
+    LeaveBalance::create([
       'period_id' => 2,
       'type_id' => 1,
       'contract_id' => 1
     ]);
 
-    $periodEntitlement1 = LeavePeriodEntitlement::getPeriodEntitlementForContract(1, 1, 1);
+    $periodEntitlement1 = LeaveBalance::getPeriodLeaveBalanceForContract(1, 1, 1);
 
     $this->assertEquals(1, $periodEntitlement1->period_id);
     $this->assertEquals(1, $periodEntitlement1->contract_id);
     $this->assertEquals(1, $periodEntitlement1->type_id);
 
-    $periodEntitlement2 = LeavePeriodEntitlement::getPeriodEntitlementForContract(1, 2, 1);
+    $periodEntitlement2 = LeaveBalance::getPeriodLeaveBalanceForContract(1, 2, 1);
 
     $this->assertEquals(2, $periodEntitlement2->period_id);
     $this->assertEquals(1, $periodEntitlement2->contract_id);
@@ -263,7 +263,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
    * @expectedExceptionMessage You must inform the Contract ID
    */
   public function testContractIdIsRequiredForGetContractEntitlementForPeriod() {
-    LeavePeriodEntitlement::getPeriodEntitlementForContract(null, 10, 11);
+    LeaveBalance::getPeriodLeaveBalanceForContract(null, 10, 11);
   }
 
   /**
@@ -271,7 +271,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
    * @expectedExceptionMessage You must inform the AbsencePeriod ID
    */
   public function testAbsencePeriodIdIsRequiredForGetContractEntitlementForPeriod() {
-    LeavePeriodEntitlement::getPeriodEntitlementForContract(10, null, 11);
+    LeaveBalance::getPeriodLeaveBalanceForContract(10, null, 11);
   }
 
   /**
@@ -279,7 +279,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
    * @expectedExceptionMessage You must inform the AbsenceType ID
    */
   public function testAbsenceTypeIdIsRequiredForGetContractEntitlementForPeriod() {
-    LeavePeriodEntitlement::getPeriodEntitlementForContract(10, 15, NULL);
+    LeaveBalance::getPeriodLeaveBalanceForContract(10, 15, NULL);
   }
 
   public function testGetEntitlementShouldIncludeOnlyPositiveLeaveBroughtForwardAndPublicHolidays() {
@@ -328,14 +328,14 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
     $this->assertEquals(-9, $periodEntitlement->getLeaveRequestBalance());
   }
 
-  public function testCanSaveALeavePeriodEntitlementFromAnEntitlementCalculation() {
+  public function testCanSaveALeaveBalanceFromAnEntitlementCalculation() {
     $type = new AbsenceType();
     $type->id = 1;
     $period = new AbsencePeriod();
     $period->id = 1;
     $contract = ['id' => 1];
 
-    $periodEntitlement = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+    $periodEntitlement = LeaveBalance::getPeriodLeaveBalanceForContract(
       $contract['id'],
       $period->id,
       $type->id
@@ -354,9 +354,9 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
       $publicHolidays
     );
 
-    LeavePeriodEntitlement::saveFromCalculation($calculation);
+    LeaveBalance::saveFromCalculation($calculation);
 
-    $periodEntitlement = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+    $periodEntitlement = LeaveBalance::getPeriodLeaveBalanceForContract(
       $contract['id'],
       $period->id,
       $type->id
@@ -403,14 +403,14 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
     $this->assertEquals(count($publicHolidays), reset($leaveBalanceChanges)->amount);
   }
 
-  public function testSaveFromCalculationWillReplaceExistingLeavePeriodEntitlement() {
+  public function testSaveFromCalculationWillReplaceExistingLeaveBalance() {
     $type = new AbsenceType();
     $type->id = 1;
     $period = new AbsencePeriod();
     $period->id = 1;
     $contract = ['id' => 1];
 
-    $periodEntitlement1 = LeavePeriodEntitlement::create([
+    $periodEntitlement1 = LeaveBalance::create([
       'contract_id' => $contract['id'],
       'period_id' => $period->id,
       'type_id' => $type->id
@@ -427,9 +427,9 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
       $proRata
     );
 
-    LeavePeriodEntitlement::saveFromCalculation($calculation);
+    LeaveBalance::saveFromCalculation($calculation);
 
-    $periodEntitlement2 = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+    $periodEntitlement2 = LeaveBalance::getPeriodLeaveBalanceForContract(
       $contract['id'],
       $period->id,
       $type->id
@@ -440,7 +440,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
 
   public function testSaveFromEntitlementCalculationCanSaveOverriddenValues() {
     // This mocks the logged in user so we can test
-    // the LeavePeriodEntitlement creation with a comment
+    // the LeaveBalance creation with a comment
     global $user;
     $user = new stdClass();
     $user->uid = 1;
@@ -466,9 +466,9 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
 
     $overriddenEntitlement = 50;
     $comment = 'Lorem ipsum dolor sit amet...';
-    LeavePeriodEntitlement::saveFromCalculation($calculation, $overriddenEntitlement, $comment);
+    LeaveBalance::saveFromCalculation($calculation, $overriddenEntitlement, $comment);
 
-    $periodEntitlement = LeavePeriodEntitlement::getPeriodEntitlementForContract(
+    $periodEntitlement = LeaveBalance::getPeriodLeaveBalanceForContract(
       $contract['id'],
       $period->id,
       $type->id
@@ -483,7 +483,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
   }
 
   private function createPeriodEntitlement() {
-    return LeavePeriodEntitlement::create([
+    return LeaveBalance::create([
       'type_id'     => 1,
       'period_id'   => 1,
       'contract_id' => 1
@@ -492,7 +492,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlementTest extends PHPUnit_Fram
 
   /**
    * Mock the calculation, as we only need to test
-   * if the LeavePeriodEntitlement BAO can create an new LeavePeriodEntitlement
+   * if the LeaveBalance BAO can create an new LeaveBalance
    * from a EntitlementCalculation instance
    *
    * @param $period

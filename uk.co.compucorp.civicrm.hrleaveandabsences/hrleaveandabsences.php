@@ -341,9 +341,9 @@ function hrleaveandabsences_civicrm_entityTypes(&$entityTypes) {
   );
 
   $entityTypes[] = array(
-    'name'  => 'LeavePeriodEntitlement',
-    'class' => 'CRM_HRLeaveAndAbsences_DAO_LeavePeriodEntitlement',
-    'table' => 'civicrm_hrleaveandabsences_leave_period_entitlement',
+    'name'  => 'LeaveBalance',
+    'class' => 'CRM_HRLeaveAndAbsences_DAO_LeaveBalance',
+    'table' => 'civicrm_hrleaveandabsences_leave_balance',
   );
 
   $entityTypes[] = array(

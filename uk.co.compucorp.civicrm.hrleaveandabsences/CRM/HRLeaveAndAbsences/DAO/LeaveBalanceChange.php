@@ -87,11 +87,11 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
    */
   public $id;
   /**
-   * FK to LeavePeriodEntitlement
+   * FK to LeaveBalance
    *
    * @var int unsigned
    */
-  public $entitlement_id;
+  public $balance_id;
   /**
    * One of the values of the Leave Balance Type option group
    *
@@ -99,7 +99,7 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
    */
   public $type_id;
   /**
-   * The amount of days this change in balance represents to the entitlement
+   * The amount of days this change in balance represents to the total balance
    *
    * @var float
    */
@@ -142,7 +142,7 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
   {
     if (!self::$_links) {
       self::$_links = static ::createReferenceColumns(__CLASS__);
-      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'entitlement_id', 'civicrm_hrleaveandabsences_leave_period_entitlement', 'id');
+      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'balance_id', 'civicrm_hrleaveandabsences_leave_balance', 'id');
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'expired_balance_id', 'civicrm_hrleaveandabsences_leave_balance_change', 'id');
     }
     return self::$_links;
@@ -162,12 +162,12 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
           'description' => 'Unique LeaveBalanceChange ID',
           'required' => true,
         ) ,
-        'entitlement_id' => array(
-          'name' => 'entitlement_id',
+        'balance_id' => array(
+          'name' => 'balance_id',
           'type' => CRM_Utils_Type::T_INT,
-          'description' => 'FK to LeavePeriodEntitlement',
+          'description' => 'FK to LeaveBalance',
           'required' => true,
-          'FKClassName' => 'CRM_HRLeaveAndAbsences_DAO_LeavePeriodEntitlement',
+          'FKClassName' => 'CRM_HRLeaveAndAbsences_DAO_LeaveBalance',
         ) ,
         'type_id' => array(
           'name' => 'type_id',
@@ -183,7 +183,7 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
           'name' => 'amount',
           'type' => CRM_Utils_Type::T_MONEY,
           'title' => ts('Amount') ,
-          'description' => 'The amount of days this change in balance represents to the entitlement',
+          'description' => 'The amount of days this change in balance represents to the total balance',
           'required' => true,
           'precision' => array(
             20,
@@ -222,7 +222,7 @@ class CRM_HRLeaveAndAbsences_DAO_LeaveBalanceChange extends CRM_Core_DAO
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
-        'entitlement_id' => 'entitlement_id',
+        'balance_id' => 'balance_id',
         'type_id' => 'type_id',
         'amount' => 'amount',
         'expiry_date' => 'expiry_date',

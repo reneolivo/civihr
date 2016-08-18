@@ -4,7 +4,7 @@
   <base>CRM/HRLeaveAndAbsences</base>
   <class>LeaveBalanceChange</class>
   <name>civicrm_hrleaveandabsences_leave_balance_change</name>
-  <comment>Store balance changes to a Leave Period Entitlement</comment>
+  <comment>Store balance changes to a Leave Balance</comment>
   <add>4.4</add>
   <log>true</log>
 
@@ -21,15 +21,15 @@
   </primaryKey>
 
   <field>
-    <name>entitlement_id</name>
+    <name>balance_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>FK to LeavePeriodEntitlement</comment>
+    <comment>FK to LeaveBalance</comment>
     <add>4.4</add>
   </field>
   <foreignKey>
-    <name>entitlement_id</name>
-    <table>civicrm_hrleaveandabsences_leave_period_entitlement</table>
+    <name>balance_id</name>
+    <table>civicrm_hrleaveandabsences_leave_balance</table>
     <key>id</key>
     <add>4.4</add>
     <onDelete>CASCADE</onDelete>
@@ -51,7 +51,7 @@
     <type>decimal</type>
     <required>true</required>
     <default>0</default>
-    <comment>The amount of days this change in balance represents to the entitlement</comment>
+    <comment>The amount of days this change in balance represents to the total balance</comment>
     <add>4.4</add>
   </field>
 

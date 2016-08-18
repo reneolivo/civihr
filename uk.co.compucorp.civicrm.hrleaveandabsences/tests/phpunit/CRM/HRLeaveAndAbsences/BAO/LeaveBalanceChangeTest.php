@@ -6,7 +6,7 @@ use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_HRLeaveAndAbsences_BAO_LeaveRequest as LeaveRequest;
 use CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChange as LeaveBalanceChange;
-use CRM_HRLeaveAndAbsences_BAO_LeavePeriodEntitlement as LeavePeriodEntitlement;
+use CRM_HRLeaveAndAbsences_BAO_LeaveBalance as LeaveBalance;
 
 /**
  * Class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest
@@ -41,10 +41,10 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
    * @expectedExceptionMessage DB Error: already exists
    */
   public function testThereCannotBeMoreThanOneExpiredRecordForEachBalanceChange() {
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $balanceChangeToExpire = LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 1,
       'amount' => 3,
       'expiry_date' => CRM_Utils_Date::processDate('2016-01-01')
@@ -53,7 +53,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
     $this->assertNotEmpty($balanceChangeToExpire->id);
 
     $expiryBalanceChange = LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 1,
       'amount' => -3,
       'expiry_date' => CRM_Utils_Date::processDate('2016-01-01'),
@@ -64,7 +64,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
     // A second expiry record should not be allowed to be created
     LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 1,
       'amount' => -3,
       'expiry_date' => CRM_Utils_Date::processDate('2016-01-01'),
@@ -73,10 +73,10 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
   }
 
   public function testGetBalanceForEntitlementCanSumAllTheBalanceChangesForAGivenEntitlement() {
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 1,
       'amount' => 4.3
     ]);
@@ -84,7 +84,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
     $this->assertEquals(4.3, LeaveBalanceChange::getBalanceForEntitlement($entitlement->id));
 
     LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 2,
       'amount' => 2
     ]);
@@ -92,7 +92,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
     $this->assertEquals(6.3, LeaveBalanceChange::getBalanceForEntitlement($entitlement->id));
 
     LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 2,
       'amount' => -3.5
     ]);
@@ -100,7 +100,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
     $this->assertEquals(2.8, LeaveBalanceChange::getBalanceForEntitlement($entitlement->id));
 
     LeaveBalanceChange::create([
-      'entitlement_id' => $entitlement->id,
+      'balance_id' => $entitlement->id,
       'type_id' => 2,
       'amount' => -2
     ]);
@@ -110,7 +110,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testBalanceForEntitlementCanSumOnlyTheBalanceChangesForLeaveRequestWithSpecificStatuses() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     // This is the initial entitlement and, since it has no
     // source_id, it will always be included in the balance SUM
@@ -181,7 +181,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testTheEntitlementBreakdownReturnsThePositiveLeaveBroughtForwardAndPublicHolidayChangesWithoutASource() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $this->createLeaveBalanceChange($entitlement->id, 10);
     $balanceChanges = LeaveBalanceChange::getBreakdownBalanceChangesForEntitlement($entitlement->id);
@@ -221,7 +221,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testTheEntitlementBreakdownSumsOnlyThePositiveLeaveBroughtForwardAndPublicHolidayChangesWithoutASource() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $this->createLeaveBalanceChange($entitlement->id, 23.5);
     $breakdownBalance = LeaveBalanceChange::getBreakdownBalanceForEntitlement($entitlement->id);
@@ -253,7 +253,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testLeaveRequestBalanceForEntitlementOnlySumBalanceChangesCreatedByLeaveRequestsWithSpecificStatus() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $this->createLeaveBalanceChange($entitlement->id, 23.5);
     $this->createBroughtForwardBalanceChange($entitlement->id, 4);
@@ -340,7 +340,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testLeaveRequestBalanceForEntitlementCanSumBalanceChangesCreatedByLeaveRequestsUpToASpecificDate() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $balance = LeaveBalanceChange::getLeaveRequestBalanceForEntitlement($entitlement->id);
     $this->assertEquals(0, $balance);
@@ -393,7 +393,7 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
 
   public function testLeaveRequestBalanceForEntitlementCanSumBalanceChangesCreatedByLeaveRequestsOnASpecificDateRange() {
     $leaveRequestStatuses = array_flip(LeaveRequest::buildOptions('status_id'));
-    $entitlement = $this->createLeavePeriodEntitlement();
+    $entitlement = $this->createLeaveBalance();
 
     $balance = LeaveBalanceChange::getLeaveRequestBalanceForEntitlement($entitlement->id);
     $this->assertEquals(0, $balance);
@@ -583,8 +583,8 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveBalanceChangeTest extends PHPUnit_Framewor
     $this->assertEquals(0, $numberOfCreatedRecords);
   }
 
-  private function createLeavePeriodEntitlement() {
-    return LeavePeriodEntitlement::create([
+  private function createLeaveBalance() {
+    return LeaveBalance::create([
       'type_id' => 1,
       'period_id' => 1,
       'contract_id' => 1
