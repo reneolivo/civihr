@@ -23,7 +23,7 @@ define([
         this.totalTaken = 0;
         this.ready = false;
         this.chartColors = d3.scale.category20();
-
+debugger;
         Leave.getCurrent()
             .then(function (response) {
                 angular.forEach(response, function (leave) {

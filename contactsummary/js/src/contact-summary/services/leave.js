@@ -95,10 +95,12 @@ define([
 
       factory.getCurrentPeriod()
         .then(function(response) {
+          debugger;
           if (response.hasOwnProperty('id')) {
             periodId = response.id;
 
             init(periodId).then(function() {
+              debugger;
               deferred.resolve(self.collection.getItem(periodId));
             });
           } else {
@@ -187,6 +189,7 @@ define([
           return Api.post('Activity', data, 'getabsences');
         })
         .then(function(response) {
+          debugger;
           absences = _.filter(response.values, function(absence) {
             return absence.status_id === '2';
           });
@@ -299,6 +302,7 @@ define([
       if (_.isEmpty(factory.collection.getItem(periodId))) {
         factory.getAbsenceTypes()
           .then(function() {
+            debugger;
             return factory.getAbsences(periodId);
           })
           .then(function() {
