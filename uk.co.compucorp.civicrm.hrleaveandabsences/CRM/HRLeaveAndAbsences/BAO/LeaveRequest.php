@@ -996,19 +996,19 @@ class CRM_HRLeaveAndAbsences_BAO_LeaveRequest extends CRM_HRLeaveAndAbsences_DAO
     return $leaveRequest;
   }
 
-  /**
-   *{@inheritdoc}
-   */
-  public function addSelectWhereClause() {
-    if (CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])) {
-      return;
-    }
-
-    $clauses['contact_id'] = $this->getLeaveInformationACLClauses();
-
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
-    return $clauses;
-  }
+//  /**
+//   *{@inheritdoc}
+//   */
+//  public function addSelectWhereClause() {
+//    if (CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])) {
+//      return;
+//    }
+//
+//    $clauses['contact_id'] = $this->getLeaveInformationACLClauses();
+//
+//    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+//    return $clauses;
+//  }
 
   /**
    * Returns Statuses considered to be Approval statuses for a Leave Request

@@ -64,7 +64,7 @@ class CRM_Contactaccessrights_Utils_ACL {
    * @return $this
    */
   private function addJobContractClause() {
-    $this->addWhereTable('car_0_jc', "INNER JOIN civicrm_hrjobcontract car_jc ON contact_a.id = car_jc.contact_id");
+    $this->addWhereTable('car_0_jc', "LEFT JOIN civicrm_hrjobcontract car_jc ON contact_a.id = car_jc.contact_id");
 
     return $this;
   }
@@ -77,7 +77,7 @@ class CRM_Contactaccessrights_Utils_ACL {
   private function addJobContractRevClause() {
     $this->addWhereTable(
       'car_1_jcr',
-      "INNER JOIN civicrm_hrjobcontract_revision car_jcr ON (car_jc.id = car_jcr.jobcontract_id AND car_jcr.effective_date <= NOW())"
+      "LEFT JOIN civicrm_hrjobcontract_revision car_jcr ON (car_jc.id = car_jcr.jobcontract_id AND car_jcr.effective_date <= NOW())"
     );
 
     return $this;
@@ -91,7 +91,7 @@ class CRM_Contactaccessrights_Utils_ACL {
   private function addJobContractDetailsClause() {
     $this->addWhereTable(
       'car_2_jcd',
-      'INNER JOIN civicrm_hrjobcontract_details car_jcd ON (
+      'LEFT JOIN civicrm_hrjobcontract_details car_jcd ON (
         car_jcr.id = car_jcd.jobcontract_revision_id AND (car_jcd.period_end_date >= NOW() OR car_jcd.period_end_date IS NULL)
       )'
     );
@@ -111,9 +111,11 @@ class CRM_Contactaccessrights_Utils_ACL {
 
     $this->addWhereTable(
       'car_3_jr',
-      "INNER JOIN civicrm_hrjobroles car_jr ON (
+      "LEFT JOIN civicrm_hrjobroles car_jr ON (
         car_jc.id = car_jr.job_contract_id AND (car_jr.location IN ({$locationIds}) OR car_jr.region IN ({$regionIds})))"
     );
+
+    $this->addWhereCondition('car_jr.location IS NOT NULL OR car_jr.region IS NOT NULL');
 
     return $this;
   }
