@@ -233,6 +233,26 @@ define([
               expect(commentsPerRow).toEqual(expectedCommentsPerRow);
             });
           });
+
+          describe('highlighting the entitlement that has comments', function () {
+            var highlightedEntitlements, expectedHighlights;
+
+            beforeEach(function () {
+              highlightedEntitlements = ctrl.changeLogRows.map(function (changeLogRow) {
+                return changeLogRow.highlightedEntitlement;
+              });
+
+              expectedHighlights = ctrl.changeLogRows.map(function (changeLogRow) {
+                return _.find(changeLogRow.entitlements, function (entitlement) {
+                  return entitlement.comment;
+                });
+              });
+            });
+
+            it('stores the only entitlement that has comments', function () {
+              expect(highlightedEntitlements).toEqual(expectedHighlights);
+            });
+          });
         });
 
         describe('change log rows order', function () {
